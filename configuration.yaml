@@ -1,0 +1,83 @@
+
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Text to speech
+tts:
+    - platform: google_translate
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+http:
+    use_x_forwarded_for: true
+    trusted_proxies:
+        - 172.30.33.0/24
+
+mqtt:
+    broker: broker.mqtt-dashboard.com
+    port: 1883
+    discovery: true
+    discovery_prefix: trab_ubi
+    sensor:
+        - name: "[trab_ubi] Temperature"
+          object_id: "trab_ubi_temperature"
+          unique_id: "trab_ubi_temperature"
+          state_topic: "trab_ubi/sensor"
+          unit_of_measurement: "°C"
+          value_template: "{{ value_json.temperature_trab_ubi }}"
+          device_class: temperature
+        - name: "[trab_ubi] Humidity"
+          object_id: "trab_ubi_humidity"
+          unique_id: "trab_ubi_humidity"
+          state_topic: "trab_ubi/sensor"
+          unit_of_measurement: "%"
+          value_template: "{{ value_json.humidity_trab_ubi }}"
+          device_class: humidity
+    binary_sensor:
+        - name: "[trab_ubi] Plug 01"
+          object_id: "trab_ubi_plug_01"
+          unique_id: "trab_ubi_plug_01"
+          state_topic: "trab_ubi/plug"
+          value_template: "{{ value_json.plug_trab_ubi1 }}"
+          device_class: plug
+        - name: "[trab_ubi] Plug 02"
+          object_id: "trab_ubi_plug_02"
+          unique_id: "trab_ubi_plug_02"
+          state_topic: "trab_ubi/plug"
+          value_template: "{{ value_json.plug_trab_ubi2 }}"
+          device_class: plug
+    switch:
+        - name: "[trab_ubi][out] Plug 1"
+          object_id: "trab_ubi_out_plug_01"
+          unique_id: "trab_ubi_out_plug_01"
+          device_class: outlet
+          command_topic: "trab_ubi/sub_plug1"
+        - name: "[trab_ubi][out] Plug 2"
+          object_id: "trab_ubi_out_plug_02"
+          unique_id: "trab_ubi_out_plug_02"
+          device_class: outlet
+          command_topic: "trab_ubi/sub_plug2"
+
+google_assistant:
+    project_id: trab-ubiquos-home-assistant
+    service_account: !include trab-ubiquos-home-assistant-e5f1fcac4646.json
+    report_state: true
+    exposed_domains:
+        - switch
+        - light
+        - sensor
+    entity_config:
+        sensor.humidity:
+            name: trab_ubi_sensor_humidade_a
+        sensor.trab_ubi_temperature:
+            name: trab_ubi_sensor_humidade_b
+        switch.kitchen:
+            name: se_voce_esta_vendo_isso_funcionou
+            aliases:
+                - BRIGHT_LIGHTS
+                - ENTRY_LIGHTS
+        light.living_room:
+            expose: false
+            room: LIVING_ROOM
